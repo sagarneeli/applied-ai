@@ -1,5 +1,4 @@
 import os
-from typing import List
 
 from dotenv import load_dotenv
 from google import genai
@@ -18,15 +17,15 @@ console = Console()
 
 class DailyPlan(BaseModel):
     day: int
-    activities: List[str]
+    activities: list[str]
 
 
 class TravelItenary(BaseModel):
     destination: str
     trip_duration_days: int
     budget_category: str
-    top_attractions: List[str]
-    daily_plan: List[DailyPlan]
+    top_attractions: list[str]
+    daily_plan: list[DailyPlan]
 
 
 def display_itinerary(itinerary: TravelItenary) -> None:
@@ -67,9 +66,7 @@ if __name__ == "__main__":
 
     client = genai.Client(api_key=GEMINI_API_KEY)
     destination = Prompt.ask("[bold cyan]Destination[/bold cyan]")
-    trip_duration_days = IntPrompt.ask(
-        "[bold cyan]Trip duration (days)[/bold cyan]", default=5
-    )
+    trip_duration_days = IntPrompt.ask("[bold cyan]Trip duration (days)[/bold cyan]", default=5)
     budget_category = Prompt.ask(
         "[bold cyan]Budget category[/bold cyan]",
         choices=["Budget", "Mid-range", "Luxury", "All"],

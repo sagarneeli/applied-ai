@@ -84,9 +84,8 @@ def _fetch_json(url: str) -> dict:
 
 def get_weather(city: str) -> dict:
     """Fetch live current weather and 3-day forecast from Open-Meteo."""
-    geo_url = (
-        "https://geocoding-api.open-meteo.com/v1/search?"
-        + urllib.parse.urlencode({"name": city, "count": 1})
+    geo_url = "https://geocoding-api.open-meteo.com/v1/search?" + urllib.parse.urlencode(
+        {"name": city, "count": 1}
     )
     geo = _fetch_json(geo_url)
     results = geo.get("results")
@@ -94,18 +93,17 @@ def get_weather(city: str) -> dict:
         return {"error": f"City '{city}' not found."}
 
     place = results[0]
-    forecast_url = (
-        "https://api.open-meteo.com/v1/forecast?"
-        + urllib.parse.urlencode(
-            {
-                "latitude": place["latitude"],
-                "longitude": place["longitude"],
-                "current": "temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code",
-                "daily": "weather_code,temperature_2m_max,relative_humidity_2m_mean,wind_speed_10m_max",
-                "forecast_days": 4,
-                "timezone": "auto",
-            }
-        )
+    forecast_url = "https://api.open-meteo.com/v1/forecast?" + urllib.parse.urlencode(
+        {
+            "latitude": place["latitude"],
+            "longitude": place["longitude"],
+            "current": "temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code",
+            "daily": (
+                "weather_code,temperature_2m_max,relative_humidity_2m_mean,wind_speed_10m_max"
+            ),
+            "forecast_days": 4,
+            "timezone": "auto",
+        }
     )
     data = _fetch_json(forecast_url)
     cur = data["current"]
@@ -137,7 +135,8 @@ def display_weather(report: WeatherReport) -> None:
 
     current_panel = Panel(
         f"[bold cyan]{report.city}[/bold cyan]\n"
-        f"[bold yellow]{report.temperature_c:.1f}°C[/bold yellow]  •  [bold white]{report.condition}[/bold white]\n"
+        f"[bold yellow]{report.temperature_c:.1f}°C[/bold yellow]  •  "
+        f"[bold white]{report.condition}[/bold white]\n"
         f"[dim]Humidity:[/dim] [bold blue]{report.humidity}%[/bold blue]   "
         f"[dim]Wind:[/dim] [bold green]{report.wind_speed:.1f} km/h[/bold green]",
         title="🌤️  Current Weather",
@@ -196,7 +195,9 @@ def run(city: str | None = None) -> WeatherReport:
             tool_results = []
             for step in interaction.steps:
                 if step.type == "function_call" and step.name == "get_weather":
-                    console.log(f"[dim]Tool called:[/dim] [cyan]{step.name}({step.arguments})[/cyan]")
+                    console.log(
+                        f"[dim]Tool called:[/dim] [cyan]{step.name}({step.arguments})[/cyan]"
+                    )
                     status.update(
                         f"[bold yellow]Running {step.name}({step.arguments})...[/bold yellow]"
                     )
@@ -213,7 +214,9 @@ def run(city: str | None = None) -> WeatherReport:
             if not tool_results:
                 break
 
-            status.update(f"[bold green]Generating structured report with {MODEL_ID}...[/bold green]")
+            status.update(
+                f"[bold green]Generating structured report with {MODEL_ID}...[/bold green]"
+            )
             interaction = client.interactions.create(
                 model=MODEL_ID,
                 previous_interaction_id=interaction.id,
@@ -233,9 +236,12 @@ if __name__ == "__main__":
             border_style="bright_blue",
         )
     )
-    city = " ".join(sys.argv[1:]).strip() or Prompt.ask(
-        "[bold cyan]Enter a city[/bold cyan] [dim](leave blank for random)[/dim]",
-        default="",
-    ).strip()
+    city = (
+        " ".join(sys.argv[1:]).strip()
+        or Prompt.ask(
+            "[bold cyan]Enter a city[/bold cyan] [dim](leave blank for random)[/dim]",
+            default="",
+        ).strip()
+    )
     report = run(city or None)
     display_weather(report)
